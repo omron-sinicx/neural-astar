@@ -4,6 +4,11 @@ object-assign
 @license MIT
 */
 
+/*!
+ * Font Awesome Free 5.15.3 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+
 /** @license React v0.19.1
  * scheduler.production.min.js
  *
