@@ -1,0 +1,19 @@
+version: "2.4"
+
+services:
+  neural-astar:
+    image: omron-sinicx/neural-astar:minimal
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    runtime: nvidia
+    container_name: ${USER}.neural-astar
+    volumes:
+      - ${PWD}:/workspace
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    ports:
+      - 8888
+      - 6666
+    command: bash
+    tty: true

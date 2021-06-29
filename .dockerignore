@@ -1,0 +1,6 @@
+.git/
+.vscode/
+neural_astar/
+notebooks/
+assets/
+data/
