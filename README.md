@@ -15,8 +15,8 @@ Neural A\* is a novel data-driven search-based planner that consists of a traina
 
 ## Overview
 - This branch presents a minimal example for training and evaluating Neural A* on shortest path problems.
-- For reproducing experiments in our ICML'21 paper, please refer to `icml2021` branch (TBA).
-- For creating datasets used in our experiments, please visit `planning datasets` repository (TBA).
+- For reproducing experiments in our ICML'21 paper, please refer to [icml2021](https://github.com/omron-sinicx/neural-astar/tree/icml2021) branch.
+- For creating datasets used in our experiments, please visit [planning datasets](https://github.com/omron-sinicx/planning-datasets) repository.
 
 ## Getting started
 - The code has been tested on Ubuntu 18.04.5 LTS.
@@ -48,3 +48,10 @@ Neural A\* is a novel data-driven search-based planner that consists of a traina
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
+
+## Acknowledgments
+This repository includes some code from [RLAgent/gated-path-planning-networks](https://github.com/RLAgent/gated-path-planning-networks) [1] with permission of the authors and from [martius-lab/blackbox-backprop](https://github.com/martius-lab/blackbox-backprop) [2].
+
+## References
+- [1] [Lisa Lee*, Emilio Parisotto*, Devendra Singh Chaplot, Eric Xing, Ruslan Salakhutdinov, "Gated Path Planning Networks", ICML, 2018.](https://arxiv.org/abs/1806.06408)
+- [2] [Marin Vlastelica Pogančić, Anselm Paulus, Vit Musil, Georg Martius, Michal Rolinek, "Differentiation of Blackbox Combinatorial Solvers", ICLR, 2020.](https://arxiv.org/abs/1912.02175)
