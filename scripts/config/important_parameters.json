@@ -1,0 +1,7 @@
+{
+    "NeuralAstar": ["NeuralAstar.g_ratio", "NeuralAstar.detach_g", "NeuralAstarPlanner.dilate_gt", "Runner.lr"], 
+    "BBAstar": ["BBAstar.g_ratio", "BBAstar.detach_g", "BBAstarPlanner.dilate_gt", "BBAstar.bbastar_lambda", "Runner.lr"], 
+    "VanillaAstar": ["VanillaAstar.g_ratio"], 
+    "SAIL": ["SAIL.beta0", "SAIL.Nmax", "Runner.lr"],
+    "SAILGPU": ["SAILGPU.beta0", "SAILGPU.Nmax", "Runner.lr"]
+}

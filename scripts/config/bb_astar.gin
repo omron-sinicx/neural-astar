@@ -1,0 +1,20 @@
+# Parameters for BBAstar:
+# ==============================================================================
+BBAstar.g_ratio = 0.5
+BBAstar.encoder_input = 'm+'                # {m|m+}
+BBAstar.encoder_arch = 'Unet'
+BBAstar.encoder_backbone = 'vgg16_bn'       # {vgg16_bn | resnet18}
+BBAstar.encoder_depth = 4                   # {4 | 2}  max: 5
+BBAstar.Tmax = %TMAX
+BBAstar.detach_g = True
+BBAstar.ignore_obstacles = True
+BBAstar.learn_obstacles = False
+BBAstar.bbastar_lambda = 20.0
+
+# Parameters for BBAstarPlanner:
+# ==============================================================================
+BBAstarPlanner.loss_fn = @L1
+BBAstarPlanner.sample_from = %SAMPLE_FROM
+BBAstarPlanner.dilate_gt = True
+BBAstarPlanner.skip_exp_when_training = True
+BBAstarPlanner.output_exp_instead_of_rel_exp = False        # Set True to output exact number of expanded nodes

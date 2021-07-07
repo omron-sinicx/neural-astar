@@ -1,0 +1,13 @@
+# Parameters for SAILGPU:
+# ==============================================================================
+SAILGPU.beta0 = 0.0
+SAILGPU.num_skips = 10
+SAILGPU.Tmax = %TMAX
+SAILGPU.Nmax = 300
+SAILGPU.cdist_factor = 2 
+
+# Parameters for SAILPlanner:
+# ==============================================================================
+SAILGPUPlanner.loss_fn = @MSELoss
+SAILGPUPlanner.sample_from = %SAMPLE_FROM
+SAILGPUPlanner.skip_exp_when_training = True

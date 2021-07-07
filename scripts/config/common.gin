@@ -1,0 +1,21 @@
+# Parameters for Runner:
+# ==============================================================================
+Runner.planner = @NeuralAstarPlanner
+Runner.mechanism = 'auto'
+Runner.optimizer_cls = @RMSprop         
+Runner.lr = 0.001                       
+Runner.scheduler_params = None          
+Runner.clip_grad = 40.0
+Runner.best_model_metric = 'hmean'
+Runner.pretrained_path = ''
+Runner.multi_gpu = False
+
+# Parameters for train:
+# ==============================================================================
+train.datafile = 'data/mpd/alternating_gaps_032_news_c8.npz'
+train.logdir = 'icml2021_test'
+train.save_intermediate = False
+train.seed = 1993
+train.batch_size = 100
+train.num_epochs = 100
+train.important_parameters_path = 'config/important_parameters.json'

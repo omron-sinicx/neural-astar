@@ -1,0 +1,19 @@
+# Parameters for NeuralAstar:
+# ==============================================================================
+NeuralAstar.g_ratio = 0.5
+NeuralAstar.encoder_input = 'm+'                # {m|m+}
+NeuralAstar.encoder_arch = 'Unet'
+NeuralAstar.encoder_backbone = 'vgg16_bn'       # {vgg16_bn | resnet18}
+NeuralAstar.encoder_depth = 4                   # {4 | 2}  max: 5
+NeuralAstar.Tmax = %TMAX
+NeuralAstar.detach_g = True
+NeuralAstar.ignore_obstacles = True
+NeuralAstar.learn_obstacles = False
+
+# Parameters for NeuralAstarPlanner:
+# ==============================================================================
+NeuralAstarPlanner.loss_fn = @L1
+NeuralAstarPlanner.sample_from = %SAMPLE_FROM
+NeuralAstarPlanner.dilate_gt = True
+NeuralAstarPlanner.skip_exp_when_training = True
+NeuralAstarPlanner.output_exp_instead_of_rel_exp = False        # Set True to output exact number of expanded nodes

@@ -1,0 +1,12 @@
+# Parameters for VanillaAstar:
+# ==============================================================================
+VanillaAstar.g_ratio = 0.0
+VanillaAstar.Tmax = %TMAX
+
+# Parameters for VanillaAstarPlanner:
+# ==============================================================================
+VanillaAstarPlanner.loss_fn = @L1
+VanillaAstarPlanner.sample_from = %SAMPLE_FROM
+VanillaAstarPlanner.dilate_gt = True
+VanillaAstarPlanner.skip_exp_when_training = True
+VanillaAstarPlanner.output_exp_instead_of_rel_exp = False

@@ -1,0 +1,4 @@
+[submodule "thirdparty/segmentation_models_pytorch"]
+	path = thirdparty/segmentation_models_pytorch
+	url = https://github.com/yonetaniryo/segmentation_models.pytorch
+	branch = icml2021

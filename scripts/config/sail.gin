@@ -1,0 +1,12 @@
+# Parameters for SAIL:
+# ==============================================================================
+SAIL.beta0 = 0.0 
+SAIL.num_skips = 10  
+SAIL.Tmax = %TMAX
+SAIL.Nmax = 300
+
+# Parameters for SAILPlanner:
+# ==============================================================================
+SAILPlanner.loss_fn = @MSELoss
+SAILPlanner.sample_from = %SAMPLE_FROM
+SAILPlanner.skip_exp_when_training = True
