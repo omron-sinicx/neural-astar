@@ -83,7 +83,25 @@ $ python visualize_results_sdd.py
 ## Citation
 
 ```
-# ICML2021 version (to appear)
+# ICML2021 version
+@InProceedings{pmlr-v139-yonetani21a,
+  title =      {Path Planning using Neural A* Search},
+  author    = {Ryo Yonetani and
+               Tatsunori Taniai and
+               Mohammadamin Barekatain and
+               Mai Nishimura and
+               Asako Kanezaki},
+  booktitle =      {Proceedings of the 38th International Conference on Machine Learning},
+  pages =      {12029--12039},
+  year =      {2021},
+  editor =      {Meila, Marina and Zhang, Tong},
+  volume =      {139},
+  series =      {Proceedings of Machine Learning Research},
+  month =      {18--24 Jul},
+  publisher =    {PMLR},
+  pdf =      {http://proceedings.mlr.press/v139/yonetani21a/yonetani21a.pdf},
+  url =      {http://proceedings.mlr.press/v139/yonetani21a.html},
+}
 
 # arXiv version
 @article{DBLP:journals/corr/abs-2009-07476,
