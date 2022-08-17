@@ -38,6 +38,9 @@ In the data, `arr_0` - `arr_3` are 800 training, `arr_4` - `arr_7` are 100 valid
 
 For each problem instance, the start location is generated randomly when `__getitem__` is called: https://github.com/omron-sinicx/neural-astar/blob/e6e626c4d159b0e4c58ee6ad33c7e03db33d72f4/neural_astar/utils/data.py#L114
 
+## Third-party implementations
+
+- [shreya-bhatt27/NeuralAstar-ported](https://github.com/shreya-bhatt27/NeuralAstar-ported): Pytorch Lightning implementation with some additional experiments. See also [their preprint](https://arxiv.org/abs/2208.04153).
 
 ## Citation
 
