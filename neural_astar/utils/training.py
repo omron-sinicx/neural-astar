@@ -43,7 +43,7 @@ def run_planner(batch: Tuple[torch.tensor, torch.tensor, torch.tensor,
     Returns:
         Tuple[torch.tensor, AstarOutput]: computed loss + planner output
     """
-    device = "cuda" if torch.cuda.is_available else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     map_designs, start_maps, goal_maps, opt_trajs = batch
     map_designs = map_designs.to(device)
     start_maps = start_maps.to(device)
