@@ -77,6 +77,18 @@ class VanillaAstar(nn.Module):
         goal_maps: torch.tensor,
         store_intermediate_results: bool = False,
     ) -> AstarOutput:
+        """
+        Perform A* search
+
+        Args:
+            map_designs (torch.tensor): map designs (obstacle maps or raw image)
+            start_maps (torch.tensor): start maps indicating the start location with one-hot binary map
+            goal_maps (torch.tensor): goal maps indicating the goal location with one-hot binary map
+            store_intermediate_results (bool, optional): If the intermediate search results are stored in Astar output. Defaults to False.
+
+        Returns:
+            AstarOutput: search histories and solution paths, and optionally intermediate search results.
+        """
 
         cost_maps = map_designs
         obstacles_maps = map_designs
@@ -146,6 +158,19 @@ class NeuralAstar(VanillaAstar):
         goal_maps: torch.tensor,
         store_intermediate_results: bool = False,
     ) -> AstarOutput:
+        """
+        Perform neural A* search
+
+        Args:
+            map_designs (torch.tensor): map designs (obstacle maps or raw image)
+            start_maps (torch.tensor): start maps indicating the start location with one-hot binary map
+            goal_maps (torch.tensor): goal maps indicating the goal location with one-hot binary map
+            store_intermediate_results (bool, optional): If the intermediate search results are stored in Astar output. Defaults to False.
+
+        Returns:
+            AstarOutput: search histories and solution paths, and optionally intermediate search results.
+        """
+
         inputs = map_designs
         if "+" in self.encoder_input:
             inputs = torch.cat((inputs, start_maps + goal_maps), dim=1)

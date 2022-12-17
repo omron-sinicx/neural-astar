@@ -155,6 +155,20 @@ class DifferentiableAstar(nn.Module):
         obstacles_maps: torch.tensor,
         store_intermediate_results: bool = False,
     ) -> AstarOutput:
+        """
+        Perform differentiable A* search
+
+        Args:
+            cost_maps (torch.tensor): cost maps
+            start_maps (torch.tensor): start maps indicating the start location with one-hot binary map
+            goal_maps (torch.tensor): goal maps indicating the goal location with one-hot binary map
+            obstacle_maps (torch.tensor): binary maps indicating obstacle locations
+            store_intermediate_results (bool, optional): If the intermediate search results are stored in Astar output. Defaults to False.
+
+        Returns:
+            AstarOutput: search histories and solution paths, and optionally intermediate search results.
+        """
+
         assert cost_maps.ndim == 4
         assert start_maps.ndim == 4
         assert goal_maps.ndim == 4
