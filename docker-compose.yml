@@ -5,7 +5,7 @@ services:
     image: omron-sinicx/neural-astar:minimal
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     runtime: nvidia
     container_name: ${USER}.neural-astar
     volumes:
