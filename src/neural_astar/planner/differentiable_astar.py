@@ -6,7 +6,7 @@ Affiliation: OSX
 from __future__ import annotations
 
 import math
-from typing import List, Optional, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import torch
 import torch.nn as nn

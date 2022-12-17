@@ -5,5 +5,6 @@ WORKDIR /workspace
 RUN pip install -U pip setuptools
 
 WORKDIR /workspace
+COPY src/ src/
 COPY pyproject.toml .
 RUN pip install -e .[dev]
