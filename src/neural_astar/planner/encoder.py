@@ -2,19 +2,19 @@
 Author: Ryo Yonetani
 Affiliation: OSX
 """
+from __future__ import annotations
 
 from typing import Optional
 
+import segmentation_models_pytorch as smp
 import torch
 import torch.nn as nn
-import segmentation_models_pytorch as smp
 
 
 class EncoderBase(nn.Module):
-    def __init__(self,
-                 input_dim: int,
-                 encoder_depth: int = 4,
-                 const: Optional[float] = None):
+    def __init__(
+        self, input_dim: int, encoder_depth: int = 4, const: Optional[float] = None
+    ):
         """
         Base Encoder
 
@@ -28,7 +28,7 @@ class EncoderBase(nn.Module):
         if const is not None:
             self.const = nn.Parameter(torch.ones(1) * const)
         else:
-            self.const = 1.
+            self.const = 1.0
 
     def construct_encoder(self, input_dim, encoder_depth) -> nn.Module:
         pass
@@ -42,8 +42,7 @@ class Unet(EncoderBase):
 
     DECODER_CHANNELS = [256, 128, 64, 32, 16]
 
-    def construct_encoder(self, input_dim: int,
-                          encoder_depth: int) -> nn.Module:
+    def construct_encoder(self, input_dim: int, encoder_depth: int) -> nn.Module:
         """
         Unet encoder
 
@@ -66,8 +65,7 @@ class CNN(EncoderBase):
 
     CHANNELS = [32, 64, 128, 256]
 
-    def construct_encoder(self, input_dim: int,
-                          encoder_depth: int) -> nn.Module:
+    def construct_encoder(self, input_dim: int, encoder_depth: int) -> nn.Module:
         """
         Simple CNN encoder
 

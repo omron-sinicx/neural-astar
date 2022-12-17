@@ -3,27 +3,27 @@ Author: Ryo Yonetani, Mohammadamin Barekatain
 Affiliation: OSX
 """
 
+from __future__ import annotations
+
 import math
-from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional, NamedTuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
-@dataclass
-class AstarOutput:
+class AstarOutput(NamedTuple):
     """
     Output structure of A* search planners
     """
+
     histories: torch.tensor
     paths: torch.tensor
     intermediate_results: Optional[List[dict]] = None
 
 
-def get_heuristic(goal_maps: torch.tensor,
-                  tb_factor: float = 0.001) -> torch.tensor:
+def get_heuristic(goal_maps: torch.tensor, tb_factor: float = 0.001) -> torch.tensor:
     """
     Get heuristic function for A* search (chebyshev + small const * euclidean)
 
@@ -46,7 +46,7 @@ def get_heuristic(goal_maps: torch.tensor,
     # chebyshev distance
     dxdy = torch.abs(loc_expand - goal_loc_expand)
     h = dxdy.sum(dim=1) - dxdy.min(dim=1)[0]
-    euc = torch.sqrt(((loc_expand - goal_loc_expand)**2).sum(1))
+    euc = torch.sqrt(((loc_expand - goal_loc_expand) ** 2).sum(1))
     h = (h + tb_factor * euc).reshape_as(goal_maps)
 
     return h
@@ -76,7 +76,7 @@ def _st_softmax_noexp(val: torch.tensor) -> torch.tensor:
 
 def expand(x: torch.tensor, neighbor_filter: torch.tensor) -> torch.tensor:
     """
-    Expand neighboring node 
+    Expand neighboring node
 
     Args:
         x (torch.tensor): selected nodes
@@ -93,8 +93,12 @@ def expand(x: torch.tensor, neighbor_filter: torch.tensor) -> torch.tensor:
     return y
 
 
-def backtrack(start_maps: torch.tensor, goal_maps: torch.tensor,
-              parents: torch.tensor, current_t: int) -> torch.tensor:
+def backtrack(
+    start_maps: torch.tensor,
+    goal_maps: torch.tensor,
+    parents: torch.tensor,
+    current_t: int,
+) -> torch.tensor:
     """
     Backtrack the search results to obtain paths
 
@@ -122,13 +126,13 @@ def backtrack(start_maps: torch.tensor, goal_maps: torch.tensor,
 
 
 class DifferentiableAstar(nn.Module):
-    def __init__(self, g_ratio: float = 0.5, Tmax: float = 0.25):
+    def __init__(self, g_ratio: float = 0.5, Tmax: float = 1.0):
         """
         Differentiable A* module
 
         Args:
             g_ratio (float, optional): ratio between g(v) + h(v). Set 0 to perform as best-first search. Defaults to 0.5.
-            Tmax (float, optional): how much of the map the planner explores during training. Defaults to 0.25.
+            Tmax (float, optional): how much of the map the planner explores during training. Defaults to 1.0.
         """
 
         super().__init__()
@@ -136,20 +140,21 @@ class DifferentiableAstar(nn.Module):
         neighbor_filter = torch.ones(1, 1, 3, 3)
         neighbor_filter[0, 0, 1, 1] = 0
 
-        self.neighbor_filter = nn.Parameter(neighbor_filter,
-                                            requires_grad=False)
+        self.neighbor_filter = nn.Parameter(neighbor_filter, requires_grad=False)
         self.get_heuristic = get_heuristic
 
         self.g_ratio = g_ratio
         assert (Tmax > 0) & (Tmax <= 1), "Tmax must be within (0, 1]"
         self.Tmax = Tmax
 
-    def forward(self,
-                cost_maps: torch.tensor,
-                start_maps: torch.tensor,
-                goal_maps: torch.tensor,
-                obstacles_maps: torch.tensor,
-                store_intermediate_results: bool = False) -> AstarOutput:
+    def forward(
+        self,
+        cost_maps: torch.tensor,
+        start_maps: torch.tensor,
+        goal_maps: torch.tensor,
+        obstacles_maps: torch.tensor,
+        store_intermediate_results: bool = False,
+    ) -> AstarOutput:
         assert cost_maps.ndim == 4
         assert start_maps.ndim == 4
         assert goal_maps.ndim == 4
@@ -162,8 +167,7 @@ class DifferentiableAstar(nn.Module):
 
         num_samples = start_maps.shape[0]
         neighbor_filter = self.neighbor_filter
-        neighbor_filter = torch.repeat_interleave(neighbor_filter, num_samples,
-                                                  0)
+        neighbor_filter = torch.repeat_interleave(neighbor_filter, num_samples, 0)
         size = start_maps.shape[-1]
 
         open_maps = start_maps
@@ -175,11 +179,12 @@ class DifferentiableAstar(nn.Module):
         g = torch.zeros_like(start_maps)
 
         parents = (
-            torch.ones_like(start_maps).reshape(num_samples, -1) *
-            goal_maps.reshape(num_samples, -1).max(-1, keepdim=True)[-1])
+            torch.ones_like(start_maps).reshape(num_samples, -1)
+            * goal_maps.reshape(num_samples, -1).max(-1, keepdim=True)[-1]
+        )
 
         size = cost_maps.shape[-1]
-        Tmax = self.Tmax if self.training else 1.
+        Tmax = self.Tmax if self.training else 1.0
         Tmax = int(Tmax * size * size)
         for t in range(Tmax):
 
@@ -189,16 +194,15 @@ class DifferentiableAstar(nn.Module):
             f_exp = f_exp * open_maps
             selected_node_maps = _st_softmax_noexp(f_exp)
             if store_intermediate_results:
-                intermediate_results.append({
-                    "histories":
-                    histories.unsqueeze(1).detach(),
-                    "paths":
-                    selected_node_maps.unsqueeze(1).detach()
-                })
+                intermediate_results.append(
+                    {
+                        "histories": histories.unsqueeze(1).detach(),
+                        "paths": selected_node_maps.unsqueeze(1).detach(),
+                    }
+                )
 
             # break if arriving at the goal
-            dist_to_goal = (selected_node_maps * goal_maps).sum((1, 2),
-                                                                keepdim=True)
+            dist_to_goal = (selected_node_maps * goal_maps).sum((1, 2), keepdim=True)
             is_unsolved = (dist_to_goal < 1e-8).float()
 
             histories = histories + selected_node_maps
@@ -237,12 +241,13 @@ class DifferentiableAstar(nn.Module):
         path_maps = backtrack(start_maps, goal_maps, parents, t)
 
         if store_intermediate_results:
-            intermediate_results.append({
-                "histories":
-                histories.unsqueeze(1).detach(),
-                "paths":
-                path_maps.unsqueeze(1).detach()
-            })
+            intermediate_results.append(
+                {
+                    "histories": histories.unsqueeze(1).detach(),
+                    "paths": path_maps.unsqueeze(1).detach(),
+                }
+            )
 
-        return AstarOutput(histories.unsqueeze(1), path_maps.unsqueeze(1),
-                           intermediate_results)
+        return AstarOutput(
+            histories.unsqueeze(1), path_maps.unsqueeze(1), intermediate_results
+        )
