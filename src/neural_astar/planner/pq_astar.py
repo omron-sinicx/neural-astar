@@ -82,14 +82,22 @@ def pq_astar(
 ) -> AstarOutput:
     """Perform standard A* on a batch of problems"""
 
-    histories = np.zeros_like(goal_maps)
-    path_maps = np.zeros_like(goal_maps)
+    assert (
+        store_intermediate_results == False
+    ), "store_intermediate_results = True is currently supported only for differentiable A*"
+
+    pred_costs_np = pred_costs.detach().numpy()
+    start_maps_np = start_maps.detach().numpy()
+    goal_maps_np = goal_maps.detach().numpy()
+    map_designs_np = map_designs.detach().numpy()
+    histories = np.zeros_like(goal_maps_np)
+    path_maps = np.zeros_like(goal_maps_np)
     for n in range(len(pred_costs)):
         histories[n, 0], path_maps[n, 0] = solve_single(
-            pred_costs[n, 0],
-            start_maps[n, 0],
-            goal_maps[n, 0],
-            map_designs[n, 0],
+            pred_costs_np[n, 0],
+            start_maps_np[n, 0],
+            goal_maps_np[n, 0],
+            map_designs_np[n, 0],
             g_ratio,
         )
 
@@ -102,8 +110,9 @@ def solve_single(
     goal_map: np.array,
     map_design: np.array,
     g_ratio: float = 0.5,
-) -> AstarOutput:
+) -> list:
     """Solve a single problem"""
+
     H, W = map_design.shape
     start_idx = np.argwhere(start_map.flatten()).item()
     goal_idx = np.argwhere(goal_map.flatten()).item()
@@ -119,7 +128,7 @@ def solve_single(
     while goal_idx not in close_list:
         if len(open_list) == 0:
             print("goal not found")
-            return None
+            return np.zeros_like(goal_map), np.zeros_like(goal_map)
         num_steps += 1
         v_idx, v_cost = open_list.popitem()
         close_list.additem(v_idx, v_cost)

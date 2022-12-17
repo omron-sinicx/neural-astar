@@ -109,7 +109,7 @@ class NeuralAstar(VanillaAstar):
             g_ratio (float, optional): ratio between g(v) + h(v). Set 0 to perform as best-first search. Defaults to 0.5.
             Tmax (float, optional): how much of the map the model explores during training. Set a small value (0.25) when training the model. Defaults to 1.0.
             encoder_input (str, optional): input format. Set "m+" to use the concatenation of map_design and (start_map + goal_map). Set "m" to use map_design only. Defaults to "m+".
-            encoder_backbone (str, optional): encoder architecture. Defaults to "vgg16_bn".
+            encoder_arch (str, optional): encoder architecture. Defaults to "CNN".
             encoder_depth (int, optional): depth of the encoder. Defaults to 4.
             learn_obstacles (bool, optional): if the obstacle is invisible to the model. Defaults to False.
             const (float, optional): learnable weight to be multiplied for h(v). Defaults to None.
