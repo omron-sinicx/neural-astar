@@ -4,16 +4,93 @@ Affiliation: OSX
 """
 from __future__ import annotations
 
-from typing import Optional
+from functools import partial
 
 import torch
 import torch.nn as nn
 
 from . import encoder
 from .differentiable_astar import AstarOutput, DifferentiableAstar
+from .pq_astar import pq_astar
 
 
-class NeuralAstar(nn.Module):
+class VanillaAstar(nn.Module):
+    def __init__(
+        self,
+        g_ratio: float = 0.5,
+        use_differentiable_astar: bool = True,
+    ):
+        """
+        Vanilla A* search
+
+        Args:
+            g_ratio (float, optional): ratio between g(v) + h(v). Set 0 to perform as best-first search. Defaults to 0.5.
+            use_differentiable_astar (bool, optional): if the differentiable A* is used instead of standard A*. Defaults to True.
+
+        Examples:
+            >>> planner = VanillaAstar()
+            >>> outputs = planner(map_designs, start_maps, goal_maps)
+            >>> histories = outputs.histories
+            >>> paths = outputs.paths
+
+        Note:
+            For perform inference on a large map, set use_differentiable_astar = False to peform a faster A* with priority queue
+        """
+
+        super().__init__()
+        self.astar = DifferentiableAstar(
+            g_ratio=g_ratio,
+            Tmax=1.0,
+        )
+        self.g_ratio = g_ratio
+        self.use_differentiable_astar = use_differentiable_astar
+
+    def perform_astar(
+        self,
+        map_designs: torch.tensor,
+        start_maps: torch.tensor,
+        goal_maps: torch.tensor,
+        obstacles_maps: torch.tensor,
+        store_intermediate_results: bool = False,
+    ) -> AstarOutput:
+
+        astar = (
+            self.astar
+            if self.use_differentiable_astar
+            else partial(pq_astar, g_ratio=self.g_ratio)
+        )
+
+        astar_outputs = astar(
+            map_designs,
+            start_maps,
+            goal_maps,
+            obstacles_maps,
+            store_intermediate_results,
+        )
+
+        return astar_outputs
+
+    def forward(
+        self,
+        map_designs: torch.tensor,
+        start_maps: torch.tensor,
+        goal_maps: torch.tensor,
+        store_intermediate_results: bool = False,
+    ) -> AstarOutput:
+
+        cost_maps = map_designs
+        obstacles_maps = map_designs
+
+        return self.perform_astar(
+            cost_maps,
+            start_maps,
+            goal_maps,
+            obstacles_maps,
+            store_intermediate_results,
+        )
+
+
+class NeuralAstar(VanillaAstar):
     def __init__(
         self,
         g_ratio: float = 0.5,
@@ -22,7 +99,8 @@ class NeuralAstar(nn.Module):
         encoder_arch: float = "CNN",
         encoder_depth: int = 4,
         learn_obstacles: bool = False,
-        const: Optional[float] = None,
+        const: float = None,
+        use_differentiable_astar: bool = True,
     ):
         """
         Neural A* search
@@ -34,14 +112,19 @@ class NeuralAstar(nn.Module):
             encoder_backbone (str, optional): encoder architecture. Defaults to "vgg16_bn".
             encoder_depth (int, optional): depth of the encoder. Defaults to 4.
             learn_obstacles (bool, optional): if the obstacle is invisible to the model. Defaults to False.
-            const (Optional[float], optional): learnable weight to be multiplied for h(v). Defaults to None.
+            const (float, optional): learnable weight to be multiplied for h(v). Defaults to None.
+            use_differentiable_astar (bool, optional): if the differentiable A* is used instead of standard A*. Defaults to True.
 
         Examples:
             >>> planner = NeuralAstar()
             >>> outputs = planner(map_designs, start_maps, goal_maps)
             >>> histories = outputs.histories
             >>> paths = outputs.paths
+
+        Note:
+            For perform inference on a large map, set use_differentiable_astar = False to peform a faster A* with priority queue
         """
+
         super().__init__()
         self.astar = DifferentiableAstar(
             g_ratio=g_ratio,
@@ -53,6 +136,8 @@ class NeuralAstar(nn.Module):
         self.learn_obstacles = learn_obstacles
         if self.learn_obstacles:
             print("WARNING: learn_obstacles has been set to True")
+        self.g_ratio = g_ratio
+        self.use_differentiable_astar = use_differentiable_astar
 
     def forward(
         self,
@@ -64,61 +149,15 @@ class NeuralAstar(nn.Module):
         inputs = map_designs
         if "+" in self.encoder_input:
             inputs = torch.cat((inputs, start_maps + goal_maps), dim=1)
-        pred_cost_maps = self.encoder(inputs)
+        cost_maps = self.encoder(inputs)
         obstacles_maps = (
             map_designs if not self.learn_obstacles else torch.ones_like(map_designs)
         )
 
-        astar_outputs = self.astar(
-            pred_cost_maps,
+        return self.perform_astar(
+            cost_maps,
             start_maps,
             goal_maps,
             obstacles_maps,
             store_intermediate_results,
         )
-
-        return astar_outputs
-
-
-class VanillaAstar(nn.Module):
-    def __init__(
-        self,
-        g_ratio: float = 0.5,
-    ):
-        """
-        Vanilla A* search
-
-        Args:
-            g_ratio (float, optional): ratio between g(v) + h(v). Set 0 to perform as best-first search. Defaults to 0.5.
-
-        Examples:
-            >>> planner = VanillaAstar()
-            >>> outputs = planner(map_designs, start_maps, goal_maps)
-            >>> histories = outputs.histories
-            >>> paths = outputs.paths
-        """
-
-        super().__init__()
-        self.astar = DifferentiableAstar(
-            g_ratio=g_ratio,
-            Tmax=1.0,
-        )
-
-    def forward(
-        self,
-        map_designs: torch.tensor,
-        start_maps: torch.tensor,
-        goal_maps: torch.tensor,
-        store_intermediate_results: bool = False,
-    ) -> AstarOutput:
-        obstacles_maps = map_designs
-
-        astar_outputs = self.astar(
-            map_designs,
-            start_maps,
-            goal_maps,
-            obstacles_maps,
-            store_intermediate_results,
-        )
-
-        return astar_outputs
