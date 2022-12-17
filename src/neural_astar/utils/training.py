@@ -3,18 +3,19 @@ Author: Ryo Yonetani
 Affiliation: OSX
 """
 
-from typing import Tuple, Sequence, Union
+from __future__ import annotations
+
 import random
 from dataclasses import dataclass
+from typing import Sequence, Tuple, Union
 
 import numpy as np
 import torch
 import torch.nn as nn
+from neural_astar.planner.differentiable_astar import AstarOutput
+from PIL import Image
 from torch.nn.modules.loss import _Loss
 from torchvision.utils import make_grid
-from PIL import Image
-
-from neural_astar.planner.differentiable_astar import AstarOutput
 
 EPS = 1e-10
 
@@ -29,9 +30,11 @@ class Metrics:
         return f"optimality: {self.p_opt:0.3f}, efficiency: {self.p_exp:0.3f}, h_mean: {self.h_mean:0.3f}"
 
 
-def run_planner(batch: Tuple[torch.tensor, torch.tensor, torch.tensor,
-                             torch.tensor], planner: nn.Module,
-                criterion: _Loss) -> Tuple[torch.tensor, AstarOutput]:
+def run_planner(
+    batch: Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor],
+    planner: nn.Module,
+    criterion: _Loss,
+) -> Tuple[torch.tensor, AstarOutput]:
     """
     Run planner on a given batch
 
@@ -72,16 +75,16 @@ def calc_metrics(na_outputs: AstarOutput, va_outputs: AstarOutput) -> Metrics:
 
     exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
     exp_na = na_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-    p_exp = np.maximum((exp_astar - exp_na) / exp_astar, 0.).mean()
+    p_exp = np.maximum((exp_astar - exp_na) / exp_astar, 0.0).mean()
 
-    h_mean = 2. / (1. / (p_opt + EPS) + 1. / (p_exp + EPS))
+    h_mean = 2.0 / (1.0 / (p_opt + EPS) + 1.0 / (p_exp + EPS))
 
     return Metrics(p_opt, p_exp, h_mean)
 
 
 def calc_metrics_from_multiple_results(
-        na_outputs_list: Sequence[AstarOutput],
-        va_outputs_list: Sequence[AstarOutput]) -> Metrics:
+    na_outputs_list: Sequence[AstarOutput], va_outputs_list: Sequence[AstarOutput]
+) -> Metrics:
     """
     Calculate opt, exp, and hmean metrics for problem instances each with multiple starting points
 
@@ -100,17 +103,17 @@ def calc_metrics_from_multiple_results(
 
         exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
         exp_na = na_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-        p_exp_list.append(np.maximum((exp_astar - exp_na) / exp_astar, 0.))
+        p_exp_list.append(np.maximum((exp_astar - exp_na) / exp_astar, 0.0))
     p_opt = np.vstack(p_opt_list).mean(0)
     p_exp = np.vstack(p_exp_list).mean(0)
-    h_mean = 2. / (1. / (p_opt + EPS) + 1. / (p_exp + EPS))
+    h_mean = 2.0 / (1.0 / (p_opt + EPS) + 1.0 / (p_exp + EPS))
 
     return Metrics(p_opt.mean(), p_exp.mean(), h_mean.mean())
 
 
-def visualize_results(map_designs: torch.tensor,
-                      planner_outputs: Union[AstarOutput, dict],
-                      scale: int = 1) -> np.ndarray:
+def visualize_results(
+    map_designs: torch.tensor, planner_outputs: Union[AstarOutput, dict], scale: int = 1
+) -> np.ndarray:
     """
     Create a visualization of search results
 
@@ -135,11 +138,12 @@ def visualize_results(map_designs: torch.tensor,
     results[h[..., 0] == 1] = torch.tensor([0.2, 0.8, 0])
     results[p[..., 0] == 1] = torch.tensor([1.0, 0.0, 0])
 
-    results = ((results.numpy()) * 255.).astype("uint8")
+    results = ((results.numpy()) * 255.0).astype("uint8")
 
     if scale > 1:
         results = Image.fromarray(results).resize(
-            [x * scale for x in results.shape[:2]], resample=Image.NEAREST)
+            [x * scale for x in results.shape[:2]], resample=Image.NEAREST
+        )
         results = np.asarray(results)
 
     return results

@@ -1,0 +1,12 @@
+seed: 1234
+dataset: "planning-datasets/data/mpd/mazes_032_moore_c8"
+modeldir: "model"
+resultdir: "gif"
+encoder: "CNN"  # either CNN or Unet
+planner: "na"   # either na or va
+problem_id: 1
+
+
+hydra:
+  job:
+    chdir: False

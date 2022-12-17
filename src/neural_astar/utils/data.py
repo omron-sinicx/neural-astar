@@ -3,23 +3,25 @@ Author: Ryo Yonetani, Mohammadamin Barekatain
 Affiliation: OSX
 """
 
-from __future__ import print_function
+from __future__ import annotations, print_function
 
 import numpy as np
 import torch.utils.data as data
 
 
-def create_dataloader(filename: str,
-                      split: str,
-                      batch_size: int,
-                      num_starts: int = 1,
-                      shuffle: bool = False) -> data.DataLoader:
+def create_dataloader(
+    filename: str,
+    split: str,
+    batch_size: int,
+    num_starts: int = 1,
+    shuffle: bool = False,
+) -> data.DataLoader:
     """
     Create dataloader from npz file
 
     Args:
         filename (str): npz file that contains train, val, and test data
-        split (str): data split: either train, valid, or test 
+        split (str): data split: either train, valid, or test
         batch_size (int): batch size
         num_starts (int): number of starting points for each problem instance. Default to 1.
         shuffle (bool, optional): whether to shuffle samples. Defaults to False.
@@ -29,10 +31,9 @@ def create_dataloader(filename: str,
     """
 
     dataset = MazeDataset(filename, split, num_starts=num_starts)
-    return data.DataLoader(dataset,
-                           batch_size=batch_size,
-                           shuffle=shuffle,
-                           num_workers=0)
+    return data.DataLoader(
+        dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0
+    )
 
 
 class MazeDataset(data.Dataset):
@@ -40,9 +41,9 @@ class MazeDataset(data.Dataset):
         self,
         filename: str,
         split: str,
-        pct1: float = .55,
-        pct2: float = .70,
-        pct3: float = .85,
+        pct1: float = 0.55,
+        pct2: float = 0.70,
+        pct3: float = 0.85,
         num_starts: int = 1,
     ):
         """
@@ -50,8 +51,8 @@ class MazeDataset(data.Dataset):
         See planning-datasets repository for how to create original file.
 
         Args:
-            filename (str): npz file that contains train, val, and test data 
-            split (str): data split: either train, valid, or test 
+            filename (str): npz file that contains train, val, and test data
+            split (str): data split: either train, valid, or test
             pct1 (float, optional): threshold 1 for sampling start locations . Defaults to .55.
             pct2 (float, optional): threshold 2 for sampling start locations . Defaults to .70.
             pct3 (float, optional): threshold 3 for sampling start locations . Defaults to .85.
@@ -71,8 +72,12 @@ class MazeDataset(data.Dataset):
         self.pcts = np.array([pct1, pct2, pct3, 1.0])
         self.num_starts = num_starts
 
-        self.map_designs, self.goal_maps, self.opt_policies, self.opt_dists = self._process(
-            filename)
+        (
+            self.map_designs,
+            self.goal_maps,
+            self.opt_policies,
+            self.opt_dists,
+        ) = self._process(filename)
 
         self.num_actions = self.opt_policies.shape[1]
         self.num_orient = self.opt_policies.shape[2]
@@ -96,12 +101,10 @@ class MazeDataset(data.Dataset):
         if self.dataset_type == "train":
             print("Number of Train Samples: {0}".format(map_designs.shape[0]))
         elif self.dataset_type == "valid":
-            print("Number of Validation Samples: {0}".format(
-                map_designs.shape[0]))
+            print("Number of Validation Samples: {0}".format(map_designs.shape[0]))
         else:
             print("Number of Test Samples: {0}".format(map_designs.shape[0]))
-        print("\tSize: {}x{}".format(map_designs.shape[1],
-                                     map_designs.shape[2]))
+        print("\tSize: {}x{}".format(map_designs.shape[1], map_designs.shape[2]))
         return map_designs, goal_maps, opt_policies, opt_dists
 
     def __getitem__(self, index: int):
@@ -123,8 +126,9 @@ class MazeDataset(data.Dataset):
     def __len__(self):
         return self.map_designs.shape[0]
 
-    def get_opt_traj(self, start_map: np.array, goal_map: np.array,
-                     opt_policy: np.array) -> np.array:
+    def get_opt_traj(
+        self, start_map: np.array, goal_map: np.array, opt_policy: np.array
+    ) -> np.array:
         """
         Get optimal path from start to goal using pre-computed optimal policy
 
@@ -165,12 +169,12 @@ class MazeDataset(data.Dataset):
         """
         od_vct = opt_dist.flatten()
         od_vals = od_vct[od_vct > od_vct.min()]
-        od_th = np.percentile(od_vals, 100. * (1 - self.pcts))
+        od_th = np.percentile(od_vals, 100.0 * (1 - self.pcts))
         r = np.random.randint(0, len(od_th) - 1)
         start_candidate = (od_vct >= od_th[r + 1]) & (od_vct <= od_th[r])
         start_idx = np.random.choice(np.where(start_candidate)[0])
         start_map = np.zeros_like(opt_dist)
-        start_map.ravel()[start_idx] = 1.
+        start_map.ravel()[start_idx] = 1.0
 
         return start_map
 
