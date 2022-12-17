@@ -3,10 +3,11 @@ Author: Ryo Yonetani
 Affiliation: OSX
 """
 
-import argparse
+import os
 import subprocess
 from datetime import datetime
 
+import hydra
 import numpy as np
 import torch
 import torch.nn as nn
@@ -24,52 +25,39 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 
-def main():
-
-    # argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--data_npz", "-d", type=str, default="data/mazes_032_moore_c8.npz"
-    )
-    parser.add_argument("--logdir", "-l", type=str, default="log")
-    parser.add_argument(
-        "--encoder-arch", "-e", type=str, default="CNN", choices=["CNN", "Unet"]
-    )
-    parser.add_argument("--batch-size", "-b", type=int, default=100)
-    parser.add_argument("--num-epochs", "-n", type=int, default=50)
-    parser.add_argument("--seed", "-s", type=int, default=1234)
-    args = parser.parse_args()
+@hydra.main(config_path="config", config_name="train")
+def main(config):
 
     # dataloaders
-    set_global_seeds(args.seed)
+    set_global_seeds(config.seed)
     train_loader = create_dataloader(
-        args.data_npz, "train", args.batch_size, shuffle=True
+        config.dataset + ".npz", "train", config.params.batch_size, shuffle=True
     )
     val_loader = create_dataloader(
-        args.data_npz, "valid", args.batch_size, shuffle=False
+        config.dataset + ".npz", "valid", config.params.batch_size, shuffle=False
     )
     test_loader = create_dataloader(
-        args.data_npz, "test", args.batch_size, shuffle=False
+        config.dataset + ".npz", "test", config.params.batch_size, shuffle=False
     )
 
     # planners
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    neural_astar = NeuralAstar(encoder_arch=args.encoder_arch)
+    neural_astar = NeuralAstar(encoder_arch=config.encoder)
     neural_astar.to(device)
     vanilla_astar = VanillaAstar()
     vanilla_astar.to(device)
 
     # training setup
-    opt = optim.RMSprop(neural_astar.parameters(), lr=0.001)
+    opt = optim.RMSprop(neural_astar.parameters(), lr=config.params.lr)
     criterion = nn.L1Loss()
 
     # logger setup
     now = str(datetime.now())
-    logdir = f"{args.logdir}/{now}"
+    logdir = f"{config.logdir}/{os.path.basename(config.dataset)}"
     writer = SummaryWriter(f"{logdir}/tb")
     h_mean_best = -1.0
 
-    for e in range(args.num_epochs):
+    for e in range(config.params.num_epochs):
         train_loss, val_loss, p_opt, p_exp, h_mean = 0.0, 0.0, 0.0, 0.0, 0.0
 
         # training

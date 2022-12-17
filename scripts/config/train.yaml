@@ -1,0 +1,14 @@
+seed: 1234
+dataset: "data/mazes_032_moore_c8"
+logdir: "model"
+encoder: "CNN"  # either CNN or Unet
+
+params:
+  batch_size: 100
+  num_epochs: 50
+  lr: 0.001
+
+
+hydra:
+  job:
+    chdir: False
