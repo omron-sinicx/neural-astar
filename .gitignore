@@ -2,7 +2,6 @@
 **/*.egg-info/
 **/__pycache__/
 .ipynb_checkpoints/
-**/tb
-**/*.pt
+model
 outputs
-data/gif
+gif

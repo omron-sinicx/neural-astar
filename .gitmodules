@@ -1,0 +1,3 @@
+[submodule "planning-datasets"]
+	path = planning-datasets
+	url = https://github.com/omron-sinicx/planning-datasets
