@@ -19,9 +19,35 @@ Neural A\* is a novel data-driven search-based planner that consists of a traina
 - For creating datasets used in our experiments, please visit [planning datasets](https://github.com/omron-sinicx/planning-datasets) repository.
 
 ## Getting started
-- The code has been tested on Ubuntu 18.04.5 LTS.
 - Try Neural A* on Google Colab! [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/omron-sinicx/neural-astar/blob/minimal/example.ipynb)
-- See also `docker-compose.yml` and `docker/Dockerfile` to reproduce our environment.
+- The code has been tested on Ubuntu >=18.04 as well as WSL2 (Ubuntu 20.04) on Windows 11, with python3 (>=3.8). Planning can be performed only on the CPU, and the use of GPUs is supported for training/evaluating Neural A\* models. We also provide Dockerfile and docker-compose.yaml to replicate our setup.
+
+### Installation (venv)
+```sh
+$ git clone --recursive https://github.com/omron-sinicx/neural-astar
+$ python -m venv .venv
+$ source .venv/bin/activate
+(.venv) $ pip install .[dev]
+```
+
+or with docker compose
+
+```sh
+$ docker compose build
+$ docker compose up -d neural-astar
+$ docker compose exec neural-astar bash
+```
+
+
+### Train Neural A\*
+```sh
+(.venv) $ python scripts/train.py
+```
+
+### Visualize and save planning results as gif 
+```sh
+(.venv) $ python scripts/create_gif.py
+```
 
 ## FAQs
 

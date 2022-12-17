@@ -42,7 +42,7 @@ def main(config):
 
     # planners
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    neural_astar = NeuralAstar(encoder_arch=config.encoder)
+    neural_astar = NeuralAstar(encoder_arch=config.encoder, Tmax=config.Tmax)
     neural_astar.to(device)
     vanilla_astar = VanillaAstar()
     vanilla_astar.to(device)
@@ -52,7 +52,6 @@ def main(config):
     criterion = nn.L1Loss()
 
     # logger setup
-    now = str(datetime.now())
     logdir = f"{config.logdir}/{os.path.basename(config.dataset)}"
     writer = SummaryWriter(f"{logdir}/tb")
     h_mean_best = -1.0
