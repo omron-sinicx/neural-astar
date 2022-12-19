@@ -8,18 +8,18 @@ Ryo Yonetani*, Tatsunori Taniai*, Mohammadamin Barekatain, Mai Nishimura, Asako 
 
 Neural A\* is a novel data-driven search-based planner that consists of a trainable encoder and a differentiable version of A\* search algorithm called differentiable A* module. Neural A\* learns from demonstrations to improve the trade-off between search optimality and efficiency in path planning and also to enable the planning directly on raw image inputs.
 
-| A\* search | Neural A\* search | 
-|:--:|:--:|
-| ![astar](assets/astar.gif) | ![neural_astar](assets/neural_astar.gif)|
+| A\* search | Neural A\* search | Planning on raw image input | 
+|:--:|:--:|:--:|
+| ![astar](assets/astar.gif) | ![neural_astar](assets/neural_astar.gif)| ![warcraft](assets/warcraft.png) |
 
 
 ## Overview
-- This branch presents a minimal example for training and evaluating Neural A* on shortest path problems.
+- This branch presents a minimal working example for training Neural A* for shortest path problems and planning on [WarCraft data](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S).
 - For reproducing experiments in our ICML'21 paper, please refer to [icml2021](https://github.com/omron-sinicx/neural-astar/tree/icml2021) branch.
 - For creating datasets used in our experiments, please visit [planning datasets](https://github.com/omron-sinicx/planning-datasets) repository.
 
 ## Getting started
-- Try Neural A* on Google Colab! [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/omron-sinicx/neural-astar/blob/minimal/example.ipynb)
+- Try Neural A* on Google Colab! [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/omron-sinicx/neural-astar/blob/minimal/notebooks/example.ipynb)
 - The code has been tested on Ubuntu >=18.04 as well as WSL2 (Ubuntu 20.04) on Windows 11, with python3 (>=3.8). Planning can be performed only on the CPU, and the use of GPUs is supported for training/evaluating Neural A\* models. We also provide Dockerfile and docker-compose.yaml to replicate our setup.
 
 ### Installation (venv)
@@ -38,16 +38,33 @@ $ docker compose up -d neural-astar
 $ docker compose exec neural-astar bash
 ```
 
+## Perform shortest path search with Neural A\* 
+See [`notebooks/example.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example.ipynb) for how it works.
 
-### Train Neural A\*
+### Training
 ```sh
 (.venv) $ python scripts/train.py
 ```
 
-### Visualize and save planning results as gif 
+You can also visualize and save planning results as gif. 
 ```sh
 (.venv) $ python scripts/create_gif.py
 ```
+
+
+## Perform planning on WarCraft data [2] with Neural A\* 
+
+
+### Preparation
+- Download `warcraft_maps.tar.gz` from [Blackbox Combinatorial Solvers page](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S). [2]
+- Extract the directory named `12x12` (smallest maps) and place it on the root of this project directory.
+
+### Training
+```sh
+(.venv) $ python scripts/train_warcraft.py
+```
+
+Once training has been done, open [`notebooks/example_warcraft.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example_warcraft.ipynb) to see how it works.
 
 ## FAQs
 

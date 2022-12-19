@@ -3,8 +3,8 @@ import os
 import hydra
 import moviepy.editor as mpy
 from neural_astar.planner import NeuralAstar, VanillaAstar
-from neural_astar.utils.data import create_dataloader
-from neural_astar.utils.training import load_from_ptl_checkpoint, visualize_results
+from neural_astar.utils.data import create_dataloader, visualize_results
+from neural_astar.utils.training import load_from_ptl_checkpoint
 
 
 @hydra.main(config_path="config", config_name="create_gif")
@@ -12,10 +12,17 @@ def main(config):
     dataname = os.path.basename(config.dataset)
 
     if config.planner == "na":
-        planner = NeuralAstar(encoder_arch=config.encoder)
+        planner = NeuralAstar(
+            encoder_input=config.encoder.input,
+            encoder_arch=config.encoder.arch,
+            encoder_depth=config.encoder.depth,
+            learn_obstacles=False,
+            Tmax=1.0,
+        )
         planner.load_state_dict(
             load_from_ptl_checkpoint(f"{config.modeldir}/{dataname}")
         )
+
     else:
         planner = VanillaAstar()
 

@@ -6,7 +6,49 @@ Affiliation: OSX
 from __future__ import annotations, print_function
 
 import numpy as np
+import torch
 import torch.utils.data as data
+from neural_astar.planner.differentiable_astar import AstarOutput
+from PIL import Image
+from torchvision.utils import make_grid
+
+
+def visualize_results(
+    map_designs: torch.tensor, planner_outputs: AstarOutput, scale: int = 1
+) -> np.ndarray:
+    """
+    Create a visualization of search results
+
+    Args:
+        map_designs (torch.tensor): input maps
+        planner_outputs (AstarOutput): outputs from planner
+        scale (int): scale factor to enlarge output images. Default to 1.
+
+    Returns:
+        np.ndarray: visualized results
+    """
+
+    if type(planner_outputs) == dict:
+        histories = planner_outputs["histories"]
+        paths = planner_outputs["paths"]
+    else:
+        histories = planner_outputs.histories
+        paths = planner_outputs.paths
+    results = make_grid(map_designs).permute(1, 2, 0)
+    h = make_grid(histories).permute(1, 2, 0)
+    p = make_grid(paths).permute(1, 2, 0).float()
+    results[h[..., 0] == 1] = torch.tensor([0.2, 0.8, 0])
+    results[p[..., 0] == 1] = torch.tensor([1.0, 0.0, 0])
+
+    results = ((results.numpy()) * 255.0).astype("uint8")
+
+    if scale > 1:
+        results = Image.fromarray(results).resize(
+            [x * scale for x in results.shape[:2]], resample=Image.NEAREST
+        )
+        results = np.asarray(results)
+
+    return results
 
 
 def create_dataloader(
@@ -201,3 +243,53 @@ class MazeDataset(data.Dataset):
         ]
         move = action_to_move[np.argmax(one_hot_action)]
         return tuple(np.add(current_loc, move))
+
+
+def create_warcraft_dataloader(
+    dirname: str,
+    split: str,
+    batch_size: int,
+    shuffle: bool = False,
+) -> data.DataLoader:
+    """
+    Create dataloader from npz file
+
+    Args:
+        dirname (str): directory name
+        split (str): data split: either train, valid, or test
+        batch_size (int): batch size
+        shuffle (bool, optional): whether to shuffle samples. Defaults to False.
+
+    Returns:
+        torch.utils.data.DataLoader: dataloader
+    """
+
+    dataset = WarCraftDataset(dirname, split)
+    return data.DataLoader(
+        dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0
+    )
+
+
+class WarCraftDataset(data.Dataset):
+    def __init__(
+        self,
+        dirname: str,
+        split: str,
+    ):
+        self.map_designs = (
+            (np.load(f"{dirname}/{split}_maps.npy").transpose(0, 3, 1, 2) / 255.0)
+        ).astype(np.float32)
+        self.paths = np.load(f"{dirname}/{split}_shortest_paths.npy").astype(np.float32)
+
+    def __getitem__(self, index: int):
+        map_design = self.map_designs[index]
+        opt_traj = self.paths[index][np.newaxis]
+        start_map = np.zeros_like(opt_traj)
+        start_map[:, 0, 0] = 1
+        goal_map = np.zeros_like(opt_traj)
+        goal_map[:, -1, -1] = 1
+
+        return map_design, start_map, goal_map, opt_traj
+
+    def __len__(self):
+        return self.map_designs.shape[0]

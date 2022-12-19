@@ -1,12 +1,13 @@
 seed: 1234
-dataset: "planning-datasets/data/mpd/mazes_032_moore_c8"
+dataset: "12x12"
 logdir: "model"
 Tmax: 0.25
 
 encoder:
-  input: "m+"
-  arch: "CNN"
-  depth: 4
+  input: "rgb+"
+  arch: "CNNDownSize"
+  depth: 3
+  const: 10.0
 
 params:
   batch_size: 100
