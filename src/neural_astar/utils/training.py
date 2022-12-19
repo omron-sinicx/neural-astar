@@ -67,21 +67,21 @@ class PlannerModule(pl.LightningModule):
         map_designs, start_maps, goal_maps, opt_trajs = val_batch
         outputs = self.forward(map_designs, start_maps, goal_maps)
         loss = nn.L1Loss()(outputs.histories, opt_trajs)
-        va_outputs = self.vanilla_astar(map_designs, start_maps, goal_maps)
-        pathlen_astar = va_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-        pathlen_model = outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-        p_opt = (pathlen_astar == pathlen_model).mean()
+        # va_outputs = self.vanilla_astar(map_designs, start_maps, goal_maps)
+        # pathlen_astar = va_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
+        # pathlen_model = outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
+        # p_opt = (pathlen_astar == pathlen_model).mean()
 
-        exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-        exp_na = outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-        p_exp = np.maximum((exp_astar - exp_na) / exp_astar, 0.0).mean()
+        # exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
+        # exp_na = outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
+        # p_exp = np.maximum((exp_astar - exp_na) / exp_astar, 0.0).mean()
 
-        h_mean = 2.0 / (1.0 / (p_opt + 1e-10) + 1.0 / (p_exp + 1e-10))
+        # h_mean = 2.0 / (1.0 / (p_opt + 1e-10) + 1.0 / (p_exp + 1e-10))
 
         self.log("metrics/val_loss", loss)
-        self.log("metrics/p_opt", p_opt)
-        self.log("metrics/p_exp", p_exp)
-        self.log("metrics/h_mean", h_mean)
+        # self.log("metrics/p_opt", p_opt)
+        # self.log("metrics/p_exp", p_exp)
+        # self.log("metrics/h_mean", h_mean)
 
         return loss
 

@@ -108,7 +108,7 @@ class NeuralAstar(VanillaAstar):
         g_ratio: float = 0.5,
         Tmax: float = 1.0,
         encoder_input: str = "m+",
-        encoder_arch: float = "CNN",
+        encoder_arch: str = "CNN",
         encoder_depth: int = 4,
         learn_obstacles: bool = False,
         const: float = None,
@@ -151,6 +151,34 @@ class NeuralAstar(VanillaAstar):
         self.g_ratio = g_ratio
         self.use_differentiable_astar = use_differentiable_astar
 
+    def encode(
+        self,
+        map_designs: torch.tensor,
+        start_maps: torch.tensor,
+        goal_maps: torch.tensor,
+    ) -> torch.tensor:
+        """
+        Encode the input problem
+
+        Args:
+            map_designs (torch.tensor): map designs (obstacle maps or raw image)
+            start_maps (torch.tensor): start maps indicating the start location with one-hot binary map
+            goal_maps (torch.tensor): goal maps indicating the goal location with one-hot binary map
+
+        Returns:
+            torch.tensor: predicted cost maps
+        """
+        inputs = map_designs
+        if "+" in self.encoder_input:
+            if map_designs.shape[-1] == start_maps.shape[-1]:
+                inputs = torch.cat((inputs, start_maps + goal_maps), dim=1)
+            else:
+                upsampler = nn.UpsamplingNearest2d(map_designs.shape[-2:])
+                inputs = torch.cat((inputs, upsampler(start_maps + goal_maps)), dim=1)
+        cost_maps = self.encoder(inputs)
+
+        return cost_maps
+
     def forward(
         self,
         map_designs: torch.tensor,
@@ -171,12 +199,9 @@ class NeuralAstar(VanillaAstar):
             AstarOutput: search histories and solution paths, and optionally intermediate search results.
         """
 
-        inputs = map_designs
-        if "+" in self.encoder_input:
-            inputs = torch.cat((inputs, start_maps + goal_maps), dim=1)
-        cost_maps = self.encoder(inputs)
+        cost_maps = self.encode(map_designs, start_maps, goal_maps)
         obstacles_maps = (
-            map_designs if not self.learn_obstacles else torch.ones_like(map_designs)
+            map_designs if not self.learn_obstacles else torch.ones_like(start_maps)
         )
 
         return self.perform_astar(
