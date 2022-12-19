@@ -14,7 +14,7 @@ Neural A\* is a novel data-driven search-based planner that consists of a traina
 
 
 ## Overview
-- This branch presents a minimal example for training and evaluating Neural A* on shortest path problems.
+- This branch presents a minimal working example for training Neural A* for shortest path problems and planning on [WarCraft data](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S).
 - For reproducing experiments in our ICML'21 paper, please refer to [icml2021](https://github.com/omron-sinicx/neural-astar/tree/icml2021) branch.
 - For creating datasets used in our experiments, please visit [planning datasets](https://github.com/omron-sinicx/planning-datasets) repository.
 
@@ -38,15 +38,13 @@ $ docker compose up -d neural-astar
 $ docker compose exec neural-astar bash
 ```
 
-
 ## Perform shortest path search with Neural A\* 
+See [`notebooks/example.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example.ipynb) for how it works.
 
 ### Training
 ```sh
 (.venv) $ python scripts/train.py
 ```
-
-Then see [`notebooks/example.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example.ipynb) for how it works.
 
 You can also visualize and save planning results as gif. 
 ```sh
@@ -54,7 +52,7 @@ You can also visualize and save planning results as gif.
 ```
 
 
-## Perform planning on WarCraft images [2] with Neural A\* 
+## Perform planning on WarCraft data [2] with Neural A\* 
 
 
 ### Preparation
@@ -66,7 +64,7 @@ You can also visualize and save planning results as gif.
 (.venv) $ python scripts/train_warcraft.py
 ```
 
-Then see [`notebooks/example_warcraft.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example_warcraft.ipynb) for how it works.
+Once training has been done, open [`notebooks/example_warcraft.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example_warcraft.ipynb) to see how it works.
 
 ## FAQs
 

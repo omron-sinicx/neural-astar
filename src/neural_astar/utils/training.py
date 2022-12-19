@@ -5,6 +5,7 @@ Affiliation: OSX
 
 from __future__ import annotations
 
+import random
 import re
 from glob import glob
 
@@ -84,3 +85,22 @@ class PlannerModule(pl.LightningModule):
             self.log("metrics/h_mean", h_mean)
 
         return loss
+
+
+def set_global_seeds(seed: int) -> None:
+    """
+    Set random seeds
+
+    Args:
+        seed (int): random seed
+    """
+
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+    np.random.seed(seed)
+    random.seed(seed)
