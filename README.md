@@ -39,15 +39,34 @@ $ docker compose exec neural-astar bash
 ```
 
 
-### Train Neural A\*
+## Perform shortest path search with Neural A\* 
+
+### Training
 ```sh
 (.venv) $ python scripts/train.py
 ```
 
-### Visualize and save planning results as gif 
+Then see [`notebooks/example.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example.ipynb) for how it works.
+
+You can also visualize and save planning results as gif. 
 ```sh
 (.venv) $ python scripts/create_gif.py
 ```
+
+
+## Perform planning on WarCraft images [2] with Neural A\* 
+
+
+### Preparation
+- Download `warcraft_maps.tar.gz` from [Blackbox Combinatorial Solvers page](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S). [2]
+- Extract the directory named `12x12` (smallest maps) and place it on the root of this project directory.
+
+### Training
+```sh
+(.venv) $ python scripts/train_warcraft.py
+```
+
+Then see [`notebooks/example_warcraft.ipnyb`](https://github.com/omron-sinicx/neural-astar/tree/minimal/notebooks/example_warcraft.ipynb) for how it works.
 
 ## FAQs
 
