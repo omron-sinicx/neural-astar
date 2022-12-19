@@ -6,6 +6,7 @@ Affiliation: OSX
 from __future__ import annotations
 
 import random
+import re
 from dataclasses import dataclass
 from typing import Sequence, Tuple, Union
 
@@ -19,6 +20,29 @@ from neural_astar.planner.differentiable_astar import AstarOutput
 from PIL import Image
 from torch.nn.modules.loss import _Loss
 from torchvision.utils import make_grid
+from glob import glob
+
+
+def load_from_ptl_checkpoint(checkpoint_path: str) -> dict:
+    """
+    Load model weights from PyTorch Lightning checkpoint.
+
+    Args:
+        checkpoint_path (str): (parent) directory where .ckpt is stored.
+
+    Returns:
+        dict: model state dict
+    """
+
+    ckpt_file = sorted(glob(f"{checkpoint_path}/**/*.ckpt", recursive=True))[-1]
+    print(f"load {ckpt_file}")
+    state_dict = torch.load(ckpt_file)["state_dict"]
+    state_dict_extracted = dict()
+    for key in state_dict:
+        if "planner" in key:
+            state_dict_extracted[re.split("planner.", key)[-1]] = state_dict[key]
+
+    return state_dict_extracted
 
 
 class PlannerModule(pl.LightningModule):
@@ -38,7 +62,7 @@ class PlannerModule(pl.LightningModule):
         map_designs, start_maps, goal_maps, opt_trajs = train_batch
         outputs = self.forward(map_designs, start_maps, goal_maps)
         loss = nn.L1Loss()(outputs.histories, opt_trajs)
-        self.log("train_loss", loss)
+        self.log("metrics/train_loss", loss)
 
         return loss
 
@@ -57,10 +81,10 @@ class PlannerModule(pl.LightningModule):
 
         h_mean = 2.0 / (1.0 / (p_opt + 1e-10) + 1.0 / (p_exp + 1e-10))
 
-        self.log("val_loss", loss)
-        self.log("val_optimality", p_opt)
-        self.log("val_efficiency", p_exp)
-        self.log("val_h_mean", h_mean)
+        self.log("metrics/val_loss", loss)
+        self.log("metrics/p_opt", p_opt)
+        self.log("metrics/p_exp", p_exp)
+        self.log("metrics/h_mean", h_mean)
 
         return loss
 
