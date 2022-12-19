@@ -7,8 +7,7 @@ from __future__ import annotations
 
 import random
 import re
-from dataclasses import dataclass
-from typing import Sequence, Tuple, Union
+from glob import glob
 
 import numpy as np
 import pytorch_lightning as pl
@@ -18,9 +17,7 @@ import torch.optim
 from neural_astar.planner.astar import VanillaAstar
 from neural_astar.planner.differentiable_astar import AstarOutput
 from PIL import Image
-from torch.nn.modules.loss import _Loss
 from torchvision.utils import make_grid
-from glob import glob
 
 
 def load_from_ptl_checkpoint(checkpoint_path: str) -> dict:
@@ -89,102 +86,8 @@ class PlannerModule(pl.LightningModule):
         return loss
 
 
-EPS = 1e-10
-
-
-@dataclass
-class Metrics:
-    p_opt: float
-    p_exp: float
-    h_mean: float
-
-    def __repr__(self):
-        return f"optimality: {self.p_opt:0.3f}, efficiency: {self.p_exp:0.3f}, h_mean: {self.h_mean:0.3f}"
-
-
-def run_planner(
-    batch: Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor],
-    planner: nn.Module,
-    criterion: _Loss,
-) -> Tuple[torch.tensor, AstarOutput]:
-    """
-    Run planner on a given batch
-
-    Args:
-        batch (Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor]): input batch
-        planner (nn.Module): planner
-        criterion (_Loss): loss function
-
-    Returns:
-        Tuple[torch.tensor, AstarOutput]: computed loss + planner output
-    """
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    map_designs, start_maps, goal_maps, opt_trajs = batch
-    map_designs = map_designs.to(device)
-    start_maps = start_maps.to(device)
-    goal_maps = goal_maps.to(device)
-    opt_trajs = opt_trajs.to(device)
-    planner_outputs = planner(map_designs, start_maps, goal_maps)
-    loss = criterion(planner_outputs.histories, opt_trajs)
-
-    return loss, planner_outputs
-
-
-def calc_metrics(na_outputs: AstarOutput, va_outputs: AstarOutput) -> Metrics:
-    """
-    Calculate opt, exp, and hmean metrics for problem instances each with a single starting point
-
-    Args:
-        na_outputs (AstarOutput): outputs from Neural A*
-        va_outputs (AstarOutput): outputs from vanilla A*
-
-    Returns:
-        Metrics: opt, exp, and hmean values
-    """
-    pathlen_astar = va_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-    pathlen_na = na_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-    p_opt = (pathlen_astar == pathlen_na).mean()
-
-    exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-    exp_na = na_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-    p_exp = np.maximum((exp_astar - exp_na) / exp_astar, 0.0).mean()
-
-    h_mean = 2.0 / (1.0 / (p_opt + EPS) + 1.0 / (p_exp + EPS))
-
-    return Metrics(p_opt, p_exp, h_mean)
-
-
-def calc_metrics_from_multiple_results(
-    na_outputs_list: Sequence[AstarOutput], va_outputs_list: Sequence[AstarOutput]
-) -> Metrics:
-    """
-    Calculate opt, exp, and hmean metrics for problem instances each with multiple starting points
-
-    Args:
-        na_outputs (Sequence[AstarOutput]): Sequence of outputs from Neural A*
-        va_outputs (Sequence[AstarOutput]): Sequence of outputs from vanilla A*
-
-    Returns:
-        Metrics: opt, exp, and hmean values
-    """
-    p_opt_list, p_exp_list = [], []
-    for na_outputs, va_outputs in zip(na_outputs_list, va_outputs_list):
-        pathlen_astar = va_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-        pathlen_na = na_outputs.paths.sum((1, 2, 3)).detach().cpu().numpy()
-        p_opt_list.append(pathlen_astar == pathlen_na)
-
-        exp_astar = va_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-        exp_na = na_outputs.histories.sum((1, 2, 3)).detach().cpu().numpy()
-        p_exp_list.append(np.maximum((exp_astar - exp_na) / exp_astar, 0.0))
-    p_opt = np.vstack(p_opt_list).mean(0)
-    p_exp = np.vstack(p_exp_list).mean(0)
-    h_mean = 2.0 / (1.0 / (p_opt + EPS) + 1.0 / (p_exp + EPS))
-
-    return Metrics(p_opt.mean(), p_exp.mean(), h_mean.mean())
-
-
 def visualize_results(
-    map_designs: torch.tensor, planner_outputs: Union[AstarOutput, dict], scale: int = 1
+    map_designs: torch.tensor, planner_outputs: AstarOutput, scale: int = 1
 ) -> np.ndarray:
     """
     Create a visualization of search results

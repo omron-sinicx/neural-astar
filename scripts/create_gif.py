@@ -1,12 +1,10 @@
-import json
 import os
 
 import hydra
 import moviepy.editor as mpy
-import torch
 from neural_astar.planner import NeuralAstar, VanillaAstar
 from neural_astar.utils.data import create_dataloader
-from neural_astar.utils.training import visualize_results
+from neural_astar.utils.training import load_from_ptl_checkpoint, visualize_results
 
 
 @hydra.main(config_path="config", config_name="create_gif")
@@ -15,7 +13,9 @@ def main(config):
 
     if config.planner == "na":
         planner = NeuralAstar(encoder_arch=config.encoder)
-        planner.load_state_dict(torch.load(f"{config.modeldir}/{dataname}/best.pt"))
+        planner.load_state_dict(
+            load_from_ptl_checkpoint(f"{config.modeldir}/{dataname}")
+        )
     else:
         planner = VanillaAstar()
 
