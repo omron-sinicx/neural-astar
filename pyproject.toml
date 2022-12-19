@@ -17,7 +17,7 @@ dependencies = [
     "numpy>=1.19.2",
     "tensorboard>=2.5",
     "moviepy>=1.0.3",
-    "pytorch-lightning-1.8.5.post0",
+    "pytorch-lightning==1.8.5.post0",
     "jupyterlab",
     "matplotlib",
     "tensorboardx",
