@@ -8,9 +8,9 @@ Ryo Yonetani*, Tatsunori Taniai*, Mohammadamin Barekatain, Mai Nishimura, Asako 
 
 Neural A\* is a novel data-driven search-based planner that consists of a trainable encoder and a differentiable version of A\* search algorithm called differentiable A* module. Neural A\* learns from demonstrations to improve the trade-off between search optimality and efficiency in path planning and also to enable the planning directly on raw image inputs.
 
-| A\* search | Neural A\* search | 
-|:--:|:--:|
-| ![astar](assets/astar.gif) | ![neural_astar](assets/neural_astar.gif)|
+| A\* search | Neural A\* search | Planning on raw image input | 
+|:--:|:--:|:--:|
+| ![astar](assets/astar.gif) | ![neural_astar](assets/neural_astar.gif)| ![warcraft](assets/warcraft.png) |
 
 
 ## Overview
