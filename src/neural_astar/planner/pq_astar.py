@@ -91,7 +91,7 @@ def pq_astar(
     goal_maps_np = goal_maps.detach().numpy()
     map_designs_np = map_designs.detach().numpy()
     histories = np.zeros_like(goal_maps_np)
-    path_maps = np.zeros_like(goal_maps_np)
+    path_maps = np.zeros_like(goal_maps_np, np.int64)
     for n in range(len(pred_costs)):
         histories[n, 0], path_maps[n, 0] = solve_single(
             pred_costs_np[n, 0],
@@ -133,19 +133,28 @@ def solve_single(
         v_idx, v_cost = open_list.popitem()
         close_list.additem(v_idx, v_cost)
         for n_idx in get_neighbor_indices(v_idx, H, W):
-            if (
-                (map_design_vct[n_idx] == 1)
-                & (n_idx not in open_list)
-                & (n_idx not in close_list)
-            ):
-                fnew = (
+
+            if map_design_vct[n_idx] == 1:
+                f_new = (
                     v_cost
                     - (1 - g_ratio) * compute_chebyshev_distance(v_idx, goal_idx, W)
                     + g_ratio * pred_cost_vct[n_idx]
                     + (1 - g_ratio) * compute_chebyshev_distance(n_idx, goal_idx, W)
                 )
-                open_list.additem(n_idx, fnew)
-                parent_list[n_idx] = v_idx
+
+                # conditions for the nodes not yet in the open list nor closed list
+                cond = (n_idx not in open_list) & (n_idx not in close_list)
+
+                # condition for the nodes already in the open list but with larger f value
+                if n_idx in open_list:
+                    cond = cond | (open_list[n_idx] > f_new)
+
+                if cond:
+                    try:
+                        open_list.additem(n_idx, f_new)
+                    except:
+                        open_list[n_idx] = f_new
+                    parent_list[n_idx] = v_idx
 
     history_map = get_history(close_list, H, W)
     path_map = backtrack(parent_list, goal_idx, H, W)
