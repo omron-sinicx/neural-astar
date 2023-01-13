@@ -130,31 +130,32 @@ def solve_single(
             print("goal not found")
             return np.zeros_like(goal_map), np.zeros_like(goal_map)
         num_steps += 1
-        v_idx, v_cost = open_list.popitem()
-        close_list.additem(v_idx, v_cost)
-        for n_idx in get_neighbor_indices(v_idx, H, W):
+        idx_selected, f_selected = open_list.popitem()
+        close_list.additem(idx_selected, f_selected)
+        for idx_nei in get_neighbor_indices(idx_selected, H, W):
 
-            if map_design_vct[n_idx] == 1:
+            if map_design_vct[idx_nei] == 1:
                 f_new = (
-                    v_cost
-                    - (1 - g_ratio) * compute_chebyshev_distance(v_idx, goal_idx, W)
-                    + g_ratio * pred_cost_vct[n_idx]
-                    + (1 - g_ratio) * compute_chebyshev_distance(n_idx, goal_idx, W)
+                    f_selected
+                    - (1 - g_ratio)
+                    * compute_chebyshev_distance(idx_selected, goal_idx, W)
+                    + g_ratio * pred_cost_vct[idx_nei]
+                    + (1 - g_ratio) * compute_chebyshev_distance(idx_nei, goal_idx, W)
                 )
 
                 # conditions for the nodes not yet in the open list nor closed list
-                cond = (n_idx not in open_list) & (n_idx not in close_list)
+                cond = (idx_nei not in open_list) & (idx_nei not in close_list)
 
                 # condition for the nodes already in the open list but with larger f value
-                if n_idx in open_list:
-                    cond = cond | (open_list[n_idx] > f_new)
+                if idx_nei in open_list:
+                    cond = cond | (open_list[idx_nei] > f_new)
 
                 if cond:
                     try:
-                        open_list.additem(n_idx, f_new)
+                        open_list.additem(idx_nei, f_new)
                     except:
-                        open_list[n_idx] = f_new
-                    parent_list[n_idx] = v_idx
+                        open_list[idx_nei] = f_new
+                    parent_list[idx_nei] = idx_selected
 
     history_map = get_history(close_list, H, W)
     path_map = backtrack(parent_list, goal_idx, H, W)
