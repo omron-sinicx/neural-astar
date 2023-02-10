@@ -1,6 +1,6 @@
 # Path Planning using Neural A\* Search (ICML 2021)
 
-This is a repository for the following paper:
+This is the official repository for the following paper:
 
 Ryo Yonetani*, Tatsunori Taniai*, Mohammadamin Barekatain, Mai Nishimura, Asako Kanezaki, "Path Planning using Neural A\* Search", ICML, 2021 [[paper]](https://arxiv.org/abs/2009.07476) [[project page]](https://omron-sinicx.github.io/neural-astar/)
 
@@ -14,7 +14,7 @@ Neural A\* is a novel data-driven search-based planner that consists of a traina
 
 
 ## Overview
-- This branch presents a minimal working example for training Neural A* for shortest path problems and planning on [WarCraft data](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S).
+- This branch presents minimal working examples for training Neural A* to (1) solve shortest path problems and (2) perform planning directly on [WarCraft map images](https://edmond.mpdl.mpg.de/dataset.xhtml?persistentId=doi:10.17617/3.YJCQ5S).
 - For reproducing experiments in our ICML'21 paper, please refer to [icml2021](https://github.com/omron-sinicx/neural-astar/tree/icml2021) branch.
 - For creating datasets used in our experiments, please visit [planning datasets](https://github.com/omron-sinicx/planning-datasets) repository.
 
