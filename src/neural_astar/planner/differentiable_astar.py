@@ -36,8 +36,8 @@ def get_heuristic(goal_maps: torch.tensor, tb_factor: float = 0.001) -> torch.te
     """
 
     # some preprocessings to deal with mini-batches
-    num_samples, size = goal_maps.shape[0], goal_maps.shape[-1]
-    grid = torch.meshgrid(torch.arange(0, size), torch.arange(0, size))
+    num_samples, H, W = goal_maps.shape[0], goal_maps.shape[-2], goal_maps.shape[-1]
+    grid = torch.meshgrid(torch.arange(0, H), torch.arange(0, W))
     loc = torch.stack(grid, dim=0).type_as(goal_maps)
     loc_expand = loc.reshape(2, -1).unsqueeze(0).expand(num_samples, 2, -1)
     goal_loc = torch.einsum("kij, bij -> bk", loc, goal_maps)

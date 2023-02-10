@@ -38,5 +38,16 @@ def test_pq_astar(setup):
     output = planner(map_designs, start_maps, goal_maps)
     planner_pq = VanillaAstar(use_differentiable_astar=False)
     output_pq = planner_pq(map_designs, start_maps, goal_maps)
-    torch.allclose(output.histories, output_pq.histories)
-    torch.allclose(output.paths, output_pq.paths)
+    assert torch.allclose(output.histories, output_pq.histories)
+    assert torch.allclose(output.paths, output_pq.paths)
+
+
+def test_astar_on_rectangle(setup):
+    from neural_astar.planner import NeuralAstar
+
+    map_designs, start_maps, goal_maps = setup
+    map_designs = torch.concat((map_designs, map_designs), -1)
+    start_maps = torch.concat((start_maps, torch.zeros_like(start_maps)), -1)
+    goal_maps = torch.concat((torch.zeros_like(goal_maps), goal_maps), -1)
+    planner = NeuralAstar()
+    output = planner(map_designs, start_maps, goal_maps)
