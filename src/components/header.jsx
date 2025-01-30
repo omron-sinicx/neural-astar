@@ -114,7 +114,7 @@ export default class Header extends React.Component {
           <div style={backgroundStyle}>
             <div className="uk-container uk-container-small uk-section">
               <div className="uk-text-center uk-text-bold">
-                <p className={titleClass} style={{ fontSize: '1.9rem' }}>
+                <p className={titleClass} style={{ fontSize: '2.3rem' }}>
                   {this.props.title}
                 </p>
                 <span

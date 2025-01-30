@@ -1,55 +1,86 @@
 theme: default # default || dark
 organization: OMRON SINIC X
 twitter: '@omron_sinicx'
-title: 'MULTIPOLAR: Multi-Source Policy Aggregation for Transfer Reinforcement Learning between Diverse Environmental Dynamics'
-conference: IJCAI2020
+title: 'Path Planning using Neural A* Search'
+conference: ICML2021
 resources:
-  paper: https://arxiv.org/abs/1909.13111
-  code: https://github.com/omron-sinicx/multipolar
-  video: https://www.youtube.com/embed/adUnIj83RtU
-  blog: https://medium.com/sinicx/multipolar-multi-source-policy-aggregation-for-transfer-reinforcement-learning-between-diverse-bc42a152b0f5
-  demo:
+  paper: https://arxiv.org/abs/2009.07476
+  code: https://github.com/omron-sinicx/neural-astar
+  video:
+  blog: https://medium.com/sinicx/path-planning-using-neural-a-search-icml-2021-ecc6f2e71b1f
+  demo: https://colab.research.google.com/github/omron-sinicx/neural-astar/blob/minimal/notebooks/example.ipynb
   huggingface:
-description: explore a new challenge in transfer RL, where only a set of source policies collected under unknown diverse dynamics is available for learning a target task efficiently.
-image: https://omron-sinicx.github.io/multipolar/teaser.png
-url: https://omron-sinicx.github.io/multipolar
-speakerdeck: b7a0614c24014dcbbb121fbb9ed234cd
+description: Novel data-driven search-based planner based on differentiable A*
+image: https://omron-sinicx.github.io/neural-astar/teaser.png
+url: https://omron-sinicx.github.io/neural-astar
+speakerdeck:
 authors:
+  - name: Ryo Yonetani*
+    affiliation: [1]
+    position: Senior Researcher
+    url: https://yonetaniryo.github.io/
+  - name: Tatsunori Taniai*
+    affiliation: [1]
+    position: Senior Researcher
+    url: https://taniai.space/
   - name: Mohammadamin Barekatain
     affiliation: [1, 2]
     url: http://barekatain.me/
     position: intern
-  - name: Ryo Yonetani
+  - name: Mai Nishimura
     affiliation: [1]
-    position: Senior Researcher
-    url: https://yonetaniryo.github.io/
-  - name: Masashi Hamaya
-    affiliation: [1]
-    position: Senior Researcher
-    url: https://sites.google.com/view/masashihamaya/home
+    position: Research Engineer
+    url: https://denkiwakame.github.io
+  - name: Asako Kanezaki
+    affiliation: [3]
+    position: Research Engineer
+    url: https://kanezaki.github.io/
+
 contact_ids: ['github', 'omron'] #=> github issues, contact@sinicx.com, 2nd author
 affiliations:
   - OMRON SINIC X Corporation
-  - Technical University of Munich
+  - Now at DeepMind
+  - Tokyo Institute of Technology
 meta:
-  - '* work done as an intern at OMRON SINIC X.'
+  - '* denotes equal contribution.'
 bibtex: >
-  # arXiv version
-
-  @article{barekatain2019multipolar,
-    title={MULTIPOLAR: Multi-Source Policy Aggregation for Transfer Reinforcement Learning between Diverse Environmental Dynamics},
-    author={Barekatain, Mohammadamin and Yonetani, Ryo and Hamaya, Masashi},
-    journal={arXiv preprint arXiv:1909.13111},
-    year={2019}
+  # ICML2021 version
+  @InProceedings{pmlr-v139-yonetani21a,
+    title =      {Path Planning using Neural A* Search},
+    author    = {Ryo Yonetani and
+                 Tatsunori Taniai and
+                 Mohammadamin Barekatain and
+                 Mai Nishimura and
+                 Asako Kanezaki},
+    booktitle =      {Proceedings of the 38th International Conference on Machine Learning},
+    pages =      {12029--12039},
+    year =      {2021},
+    editor =      {Meila, Marina and Zhang, Tong},
+    volume =      {139},
+    series =      {Proceedings of Machine Learning Research},
+    month =      {18--24 Jul},
+    publisher =    {PMLR},
+    pdf =      {http://proceedings.mlr.press/v139/yonetani21a/yonetani21a.pdf},
+    url =      {http://proceedings.mlr.press/v139/yonetani21a.html},
   }
 
-  # IJCAI version
-
-  @inproceedings{barekatain2020multipolar,
-    title={MULTIPOLAR: Multi-Source Policy Aggregation for Transfer Reinforcement Learning between Diverse Environmental Dynamics},
-    author={Barekatain, Mohammadamin and Yonetani, Ryo and Hamaya, Masashi},
-    booktitle={International Joint Conference on Artificial Intelligence (IJCAI)},
-    year={2020}
+  # arXiv version
+  @article{DBLP:journals/corr/abs-2009-07476,
+    author    = {Ryo Yonetani and
+                 Tatsunori Taniai and
+                 Mohammadamin Barekatain and
+                 Mai Nishimura and
+                 Asako Kanezaki},
+    title     = {Path Planning using Neural A* Search},
+    journal   = {CoRR},
+    volume    = {abs/2009.07476},
+    year      = {2020},
+    url       = {https://arxiv.org/abs/2009.07476},
+    archivePrefix = {arXiv},
+    eprint    = {2009.07476},
+    timestamp = {Wed, 23 Sep 2020 15:51:46 +0200},
+    biburl    = {https://dblp.org/rec/journals/corr/abs-2009-07476.bib},
+    bibsource = {dblp computer science bibliography, https://dblp.org}
   }
 header:
   bg_curve:
@@ -58,19 +89,27 @@ header:
 
 teaser: teaser.png
 overview: |
-  Transfer reinforcement learning (RL) aims at improving learning efficiency of an agent by exploiting knowledge from other source agents trained on relevant tasks. However, it remains challenging to transfer knowledge between different environmental dynamics without having access to the source environments. In this work, we explore a new challenge in transfer RL, where only a set of source policies collected under unknown diverse dynamics is available for learning a target task efficiently. To address this problem, the proposed approach, *MULTI-source POLicy AggRegation (MULTIPOLAR)*, comprises two key techniques. We learn to aggregate the actions provided by the source policies adaptively to maximize the target task performance. Meanwhile, we learn an auxiliary network that predicts residuals around the aggregated actions, which ensures the target policy”s expressiveness even when some of the source policies perform poorly. We demonstrated the effectiveness of MULTIPOLAR through an extensive experimental evaluation across six simulated environments ranging from classic control problems to challenging robotics simulations, under both continuous and discrete action spaces.
+  We present *Neural A\**, a novel data-driven search method for path planning problems. Despite the recent increasing attention to data-driven path planning, machine learning approaches to search-based planning are still challenging due to the discrete nature of search algorithms. In this work, we reformulate a canonical A* search algorithm to be differentiable and couple it with a convolutional encoder to form an end-to-end trainable neural network planner. Neural A* solves a path planning problem by encoding a problem instance to a guidance map and then performing the differentiable A* search with the guidance map. By learning to match the search results with ground-truth paths provided by experts, Neural A* can produce a path consistent with the ground truth accurately and efficiently. Our extensive experiments confirmed that Neural A* outperformed state-of-the-art data-driven planners in terms of the search optimality and efficiency trade-off. Furthermore, Neural A* successfully predicted realistic human trajectories by directly performing search-based planning on natural image inputs.
 
-body: null
-projects:
-  - title: 'TRANS-AM: Transfer Learning by Aggregating Dynamics Models for Soft Robotic Assembly”, International Conference on Robotics and Automation'
-    journal: "ICRA'21'"
-    img: https://kazutoshi-tanaka.github.io/pages/teaser.png
-    description: |
-      TRANS-AM is a transfer reinforcement learning method that improves sample efficiency by adaptively aggregating dynamics models from source environments, enabling robots to quickly adapt to unseen tasks with fewer episodes.
-    url: https://kazutoshi-tanaka.github.io/pages/transam.html
-  - title: Adaptive Distillation for Decentralized Learning from Heterogeneous Clients
-    journal: "ICPR'20"
-    img: icpr20.png
-    description: |
-      a new decentralized learning method that aggregates diverse client models using adaptive distillation to train a high-performance global model, demonstrated to be effective across multiple datasets.
-    url: https://arxiv.org/abs/2008.07948
+body:
+  - title: Neural A*
+  - text: |
+      We reformulate a canonical A* search algorithm to be differentiable as a module referred to as the differentiable A*, by combining a discretized activation technique with basic matrix operations. This module enables us to perform an A* search in the forward pass of a neural network and back-propagate losses through every search step to other trainable backbone modules.
+
+      <img src="method.png" />
+
+      As illustrated in the figure above, Neural A* consists of the combination of a fully-convolutional encoder and the differentiable A* module, and is trained as follows: (1) Given a problem instance (i.e., an environmental map annotated with start and goal points), the encoder transforms it into a scalar-valued map representation referred to as a guidance map; (2) The differentiable A* module then performs a search with the guidance map to output a search history and a resulting path; (3) The search history is compared against the ground-truth path of the input instance to derive a loss, which is back-propagated to train the encoder.
+  - title: Results
+  - text: |
+      ### Point-to-Point Shortest Path Problems
+      We conducted an extensive experiment to evaluate the effectiveness of Neural A* for point-to-point shortest path problems. By learning from optimal planners, Neural A* outperformed state-of-the-art data-driven search-based planners in terms of the trade-off between search optimality and efficiency.
+      <img src="result1.png" class="uk-align-center uk-responsive-width uk-margin-remove-bottom" />
+      <p class="uk-text-center uk-text-meta uk-margin-remove-top">Comparisons with SAIL [Choudhury+, 2018] and Black-box differentiation (BB-A*) [Vlastelica+, 2020]. Black pixels indicate obstacles. Start nodes (indicated by "S"), goal nodes (indicated by "G"), and found paths are annotated in red. Other explored nodes are colored in green. In the rightmost column, guidance maps learned by Neural A* are overlaid on the input maps where regions with lower costs are visualized in white.</p>
+
+      ### Path Planning on Raw Image Inputs
+      We also address the task of planning paths directly on raw image inputs. Suppose a video of an outdoor scene taken by a stationary surveillance camera. Given planning demonstrations consisting of color images of the scene and actual trajectories of pedestrians, Neural A* can predict realistic trajectories consistent with those of pedestrians when start and goal locations are provided.
+
+      <img src="result2.png" class="uk-align-center uk-responsive-width uk-margin-remove-bottom"/>
+      <p class="uk-text-center uk-text-meta uk-margin-remove-top">Comparisons with Black-box differentiation (BB-A*) [Vlastelica+, 2020].</p>
+
+projects: null
